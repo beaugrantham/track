@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - /opt/track/mysql:/var/lib/mysql
+  track-ui:
+    image: beaugrantham/track-ui
+    ports:
+      - 8080:8080
