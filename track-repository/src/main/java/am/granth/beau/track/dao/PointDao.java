@@ -17,7 +17,7 @@ public interface PointDao extends CrudRepository<Point, Integer> {
 
 	/**
 	 * Find all {@link Point}s with the specified parameters. The returned list is
-	 * ordered by ID ascending.
+	 * ordered by ID descending.
 	 * 
 	 * @param user
 	 *            The {@link User} to which the point belongs.
@@ -30,6 +30,6 @@ public interface PointDao extends CrudRepository<Point, Integer> {
 	 * @return a {@link List} of {@link Point}s matching the specified criteria
 	 *         ordered by ID ascending.
 	 */
-	List<Point> findByUserAndRelationIdGreaterThanAndReportedTimestampBetweenOrderByIdAsc(User user, int relation, Date fromDate, Date toDate);
+	List<Point> findByUserAndRelationIdGreaterThanAndReportedTimestampBetweenOrderByIdDesc(User user, int relation, Date fromDate, Date toDate);
 
 }

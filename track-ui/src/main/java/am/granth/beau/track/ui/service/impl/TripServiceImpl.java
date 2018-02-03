@@ -32,7 +32,7 @@ public class TripServiceImpl implements TripService {
 
 	@Override
 	public List<Point> getPoints(Trip trip) {
-		return pointDao.findByUserAndRelationIdGreaterThanAndReportedTimestampBetweenOrderByIdAsc(trip.getUser(), 0, trip.getStartDate(), trip.getEndDate());
+		return pointDao.findByUserAndRelationIdGreaterThanAndReportedTimestampBetweenOrderByIdDesc(trip.getUser(), 0, trip.getStartDate(), trip.getEndDate());
 	}
 
 }
