@@ -29,6 +29,8 @@ import de.micromata.opengis.kml.v_2_2_0.KmlFactory;
 import de.micromata.opengis.kml.v_2_2_0.LineString;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
 import de.micromata.opengis.kml.v_2_2_0.Style;
+import de.micromata.opengis.kml.v_2_2_0.Units;
+import de.micromata.opengis.kml.v_2_2_0.Vec2;
 
 /**
  * Controller for KML generation.
@@ -62,8 +64,6 @@ public class KmlController {
 	 * Generate KML for the given slug. The cache variable is used for client
 	 * cacheing.
 	 * 
-	 * TODO: FQDNs/URLs should not be hardcoded.
-	 * 
 	 * @param slug
 	 *            The slug to use for looking up a trip.
 	 * @param random
@@ -92,22 +92,42 @@ public class KmlController {
 		Kml kml = KmlFactory.createKml();
 		Document document = kml.createAndSetDocument();
 
-		final Style markerStyle = document.createAndAddStyle().withId("markerStyle");
-		markerStyle.createAndSetIconStyle().withIcon(new Icon().withHref("https://track.beau.granth.am/resources/img/red_circle.png"));
+		Vec2 iconHotspot = new Vec2()
+				.withX(0.5).withXunits(Units.FRACTION)
+				.withY(0).withYunits(Units.FRACTION);
 
-		final Style annotationStyle = document.createAndAddStyle().withId("annotationStyle");
-		annotationStyle.createAndSetIconStyle().withIcon(new Icon().withHref("https://track.beau.granth.am/resources/img/mm_20_yellow.png"));
+		final Style stylePlacemark = document.createAndAddStyle().withId("stylePlacemark");
+		stylePlacemark.createAndSetIconStyle()
+				.withIcon(new Icon().withHref("https://maps.google.com/mapfiles/ms/icons/red-dot.png"))
+				.withHotSpot(iconHotspot)
+				.withScale(1);
+
+		final Style styleWaymark = document.createAndAddStyle().withId("styleWaymark");
+		styleWaymark.createAndSetIconStyle()
+				.withIcon(new Icon().withHref("https://maps.google.com/mapfiles/ms/icons/yellow.png"))
+				.withHotSpot(iconHotspot)
+				.withScale(0.7);
+
+		final Style styleLive = document.createAndAddStyle().withId("styleLive");
+		styleLive.createAndSetIconStyle()
+				.withIcon(new Icon().withHref("https://track.beau.granth.am/resources/img/red_circle.png"))
+				.withScale(1);
+
+		final Style trackStyle = document.createAndAddStyle().withId("stylePath");
+		trackStyle.createAndSetLineStyle()
+				.withColor("#a0ea8b17")
+				.withWidth(5);
 		
 		if (!points.isEmpty()) {
-			Placemark placemark = document.createAndAddPlacemark()
+			Placemark pathPlacemark = document.createAndAddPlacemark()
 					.withName(trip.getName())
-					.withDescription(trip.getDescription());
+					.withStyleUrl("#stylePath");
 
-			LineString lineString = placemark.createAndSetLineString();
-			List<Coordinate> coordinateList = lineString.createAndSetCoordinates();
+			LineString pathLineString = pathPlacemark.createAndSetLineString();
+			List<Coordinate> pathCoordinateList = pathLineString.createAndSetCoordinates();
 
 			for (Point p : points) {
-				coordinateList.add(new Coordinate(
+				pathCoordinateList.add(new Coordinate(
 						Double.parseDouble(p.getReportedLongitude().toString()),
 						Double.parseDouble(p.getReportedLatitude().toString())));
 				
@@ -116,14 +136,11 @@ public class KmlController {
 				 */
 				
 				if (!StringUtils.isEmpty(p.getAnnotation())) {
-					Placemark currentLocation = document.createAndAddPlacemark()
-							.withName("Annotation")
+					Placemark waymarkPlacemark = document.createAndAddPlacemark()
 							.withDescription(p.getAnnotation())
-							.withStyleUrl("#annotationStyle");
-	
-					de.micromata.opengis.kml.v_2_2_0.Point markerPoint = currentLocation.createAndSetPoint();
-	
-					markerPoint.addToCoordinates(
+							.withStyleUrl("#styleWaymark");
+
+					waymarkPlacemark.createAndSetPoint().addToCoordinates(
 							Double.parseDouble(p.getReportedLongitude().toString()),
 							Double.parseDouble(p.getReportedLatitude().toString()));
 				}
@@ -136,14 +153,12 @@ public class KmlController {
 			Date currentDate = new Date();
 
 			if (currentDate.after(trip.getStartDate()) && currentDate.before(trip.getEndDate())) {
-				Placemark currentLocation = document.createAndAddPlacemark()
+				Placemark livePlacemark = document.createAndAddPlacemark()
 						.withName("Current Location")
 						.withDescription(points.get(0).getReportedReverseGeocode())
-						.withStyleUrl("#markerStyle");
+						.withStyleUrl("#styleLive");
 
-				de.micromata.opengis.kml.v_2_2_0.Point markerPoint = currentLocation.createAndSetPoint();
-
-				markerPoint.addToCoordinates(
+				livePlacemark.createAndSetPoint().addToCoordinates(
 						Double.parseDouble(points.get(0).getReportedLongitude().toString()),
 						Double.parseDouble(points.get(0).getReportedLatitude().toString()));
 			}
@@ -154,13 +169,12 @@ public class KmlController {
 		 */
 		
 		for (Marker marker : trip.getMarkers()) {
-			Placemark markerPlacemark = document.createAndAddPlacemark()
+			Placemark placemark = document.createAndAddPlacemark()
 					.withName(marker.getDescription())
-					.withDescription(marker.getDescription());
+					.withDescription(marker.getDescription())
+					.withStyleUrl("#stylePlacemark");
 
-			de.micromata.opengis.kml.v_2_2_0.Point markerPoint = markerPlacemark.createAndSetPoint();
-
-			markerPoint.addToCoordinates(
+			placemark.createAndSetPoint().addToCoordinates(
 					Double.parseDouble(marker.getLongitude().toString()),
 					Double.parseDouble((marker.getLatitude().toString())));
 		}
@@ -173,14 +187,7 @@ public class KmlController {
 			// Not dealing with files
 		}
 
-		String output = new String(outputStream.toByteArray(), Charset.defaultCharset());
-
-		// Remove namespace to be compatible with Google Maps
-		// https://github.com/micromata/javaapiforkml/issues/5
-		output = output.replace("ns2:", "");
-		output = output.replace(":ns2", "");
-		
-		return output;
+		return new String(outputStream.toByteArray(), Charset.defaultCharset());
 	}
 
 }

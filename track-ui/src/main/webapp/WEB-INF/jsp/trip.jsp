@@ -4,10 +4,13 @@
 <%@ page session="false" %>
 
 <t:site>
-	<jsp:attribute name="title">Beau Grantham | Track | Trips</jsp:attribute>
+	<jsp:attribute name="title">Beau Grantham | Track | <c:out value="${trip.name}" /></jsp:attribute>
 
 	<jsp:attribute name="header">
-	    <script src="https://maps.google.com/maps/api/js?key=AIzaSyCPjJD7Y1_Dw3KI54xgUxGR5cxmOG2fzic&sensor=false"></script>
+		<link rel="stylesheet" href="<c:url value="/resources/css/ol.css" />" />
+		<link rel="stylesheet" href="<c:url value="/resources/css/ol-popup.css" />" />
+		<script src="<c:url value="/resources/js/ol.js" />"></script>
+		<script src="<c:url value="/resources/js/ol-popup.js" />"></script>
 	</jsp:attribute>
 
 	<jsp:body>
@@ -110,69 +113,93 @@
 		</div><!--end wrapper-->
 	    
 	    <script>
-	        $(document).ready(function() {
-                var centerLatlng = new google.maps.LatLng(<c:out value="${trip.mapCenterLatitude}" />, <c:out value="${trip.mapCenterLongitude}" />);
-                var myOptions = {
-                    zoom: <c:out value="${trip.mapZoom}" />,
-                    center: centerLatlng,
-                    mapTypeId: 'Styled'
-                }
+			$(document).ready(function() {
+	    		// Main view
+				var view = new ol.View({
+					center: ol.proj.fromLonLat([<c:out value="${trip.mapCenterLongitude}" />, <c:out value="${trip.mapCenterLatitude}" />]),
+					zoom: <c:out value="${trip.mapZoom}" />
+				});
 
-                var map = new google.maps.Map(document.getElementById("map"), myOptions);
+				// KML source
+				var source = new ol.source.Vector({
+					url: '<c:url value="/kml" />/<c:out value="${slug}" />/<c:out value="${timestamp}" />.kml',
+					format: new ol.format.KML()
+				});
 
-                var styles = [
-                    {
-                        featureType: 'landscape',
-                        elementType: 'all',
-                        stylers: [
-                            { hue: '#FFFFFF' },
-                            { saturation: -100 },
-                            { lightness: 100 },
-                            { visibility: 'on' }
-                        ]
-                    }
-                ];
+				// Fit map to KML content
+				source.on('change', function() {
+					view.fit(this.getExtent());
+				});
 
-                var styledMapType = new google.maps.StyledMapType(styles, { name: 'Styled' });
-                map.mapTypes.set('Styled', styledMapType);
+				// KML layer
+				var kml = new ol.layer.Vector({
+					source: source
+				});
 
-                var weatherOverlay = null;
-                google.maps.event.addListener(map, 'idle', function() {
-					var bounds = this.getBounds();
-					var southWest = bounds.getSouthWest();
-					var northEast = bounds.getNorthEast();
-					
-                	var weatherUrl = "https://radblast.wunderground.com/cgi-bin/radar/WUNIDS_composite";
-                	weatherUrl += "?maxlat=" + northEast.lat() + "&maxlon=" + northEast.lng();
-                	weatherUrl += "&minlat=" + southWest.lat() + "&minlon=" + southWest.lng();
-                	weatherUrl += "&type=00Q&frame=0&num=1&delay=25";
-                	weatherUrl += "&width=" + $("#map").width();
-                	weatherUrl += "&height=" + $("#map").height();
-                	weatherUrl += "&png=0&smooth=1&min=0&noclutter=1&rainsnow=1&nodebug=0&theext=.gif&merge=elev&reproj.automerc=1&timelabel=0&brand=wundermap";
-                	weatherUrl += "&rand=<c:out value="${now}" />";
+				// Map
+				var map = new ol.Map({
+					target: 'map',
+					view: view,
+					layers: [
+						new ol.layer.Tile({
+							source: new ol.source.XYZ({
+								url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ'
+							})
+						}),
+						<c:if test="${showWeather}">
+					        new ol.layer.Tile({
+								source: new ol.source.TileWMS({
+									url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi',
+									params: {'LAYERS': 'nexrad-n0q-900913'},
+					            }),
+					            opacity: 0.7
+							}),
+		                </c:if>
+						kml
+					]
+				});
 
-                    <c:if test="${showWeather}">
-						if (weatherOverlay != null) {
-							weatherOverlay.setMap(null);
+				// Feature popup
+				var popup = new ol.Overlay.Popup();
+				map.addOverlay(popup);
+
+				var displayFeatureInfo = function(evt) {
+					var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature) {
+						if (feature.get('description')) {
+							return feature;
 						}
-	
-	                    weatherOverlay = new google.maps.GroundOverlay(
-	                            weatherUrl,
-	                            bounds,
-	                            {
-									opacity: 0.7	                            	
-	                            });
-	                    weatherOverlay.setMap(map);
-                	</c:if>                	
-                });
+					});
 
-	            var geoXml = new google.maps.KmlLayer(
-            		'https://track.beau.granth.am<c:url value="/kml" />/<c:out value="${slug}" />/<c:out value="${timestamp}" />.kml',
-            		{
-            			map: map,
-            			preserveViewport: false
-            		});
-	        });
+					if (feature) {
+					    popup.show(evt.coordinate, '<div><p>' + feature.get('description') + '</p></div>');
+					} else {
+						popup.hide();
+					}
+				};
+
+				// Display feature description when clicked
+				map.on('singleclick', function(evt) {
+					displayFeatureInfo(evt);
+				});
+
+				// Change cursor style for features with descriptions
+				map.on('pointermove', function(e) {
+					if (e.dragging) {
+						popup.hide();
+						return;
+					}
+					
+					var pixel = map.getEventPixel(e.originalEvent);
+
+					var hit = this.forEachFeatureAtPixel(pixel, function(feature, layer) {
+						if (feature.get('description')) {
+							return true;
+						}
+					}); 
+
+					map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+				});				
+			});
 	    </script>
 	</jsp:body>
 </t:site>
