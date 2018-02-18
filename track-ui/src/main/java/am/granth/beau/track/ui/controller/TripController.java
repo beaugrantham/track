@@ -119,26 +119,9 @@ public class TripController {
 		model.addAttribute("timestamp", timestamp);
 		model.addAttribute("showWeather", now.before(trip.getEndDate()) ? true : false);
 
-		return "trip";
+		return "bs/trip";
 	}
-
-	/**
-	 * View for displaying a single trip in a large view.
-	 * 
-	 * @param model
-	 *            The {@link Model} object.
-	 * @param slug
-	 *            The trip slug.
-	 * @return the large view for a single trip.
-	 */
-	@RequestMapping(value = "/{slug}/popout", method = RequestMethod.GET)
-	public String popOut(Model model, @PathVariable("slug") String slug) {
-		@SuppressWarnings("unused")
-		String unused = getTrip(model, slug);
-
-		return "full";
-	}
-	
+	               
 	/**
 	 * Display thumbnail image for a trip.
 	 * 

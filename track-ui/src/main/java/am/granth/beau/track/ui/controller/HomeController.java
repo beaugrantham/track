@@ -47,7 +47,7 @@ public class HomeController {
         model.addAttribute("category", category);
         model.addAttribute("trips", trips);
         
-        return "home";
+        return "bs/home";
     }
 
 }
