@@ -3,117 +3,122 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ page session="false" %>
 
-<t:site>
-	<jsp:attribute name="title">Beau Grantham | Track | <c:out value="${trip.name}" /></jsp:attribute>
+<!DOCTYPE html>
+<html lang="en">
 
-	<jsp:attribute name="header">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="Beau Grantham">
+		
+		<title>Beau Grantham | Track | <c:out value="${trip.name}" /></title>
+		
+		<!-- OpenLayers CSS -->
 		<link rel="stylesheet" href="<c:url value="/resources/css/ol.css" />" />
 		<link rel="stylesheet" href="<c:url value="/resources/css/ol-popup.css" />" />
-		<script src="<c:url value="/resources/js/ol.js" />"></script>
-		<script src="<c:url value="/resources/js/ol-popup.js" />"></script>
-	</jsp:attribute>
-
-	<jsp:body>
-		<div id="wrapper" class="container_12 clearfix">		
-			
-			<!-- Text Logo -->
-			<h1 id="logo" class="grid_4"><a href="<c:url value="/" />" style="color: #000000;">track</a></h1>
-			
-			<!-- Navigation Menu -->
-			<ul id="navigation" class="grid_8">
-				<li><a href="<c:url value="/trips" />" class="current"><span class="meta">Past Adventures</span><br />Trips</a></li>
-				<li><a href="<c:url value="/" />"><span class="meta">Homepage&nbsp;&nbsp;</span><br />Home</a></li>
-			</ul>
-			
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-				
-			<!-- Caption Line -->
-			<h2 class="grid_12 caption clearfix">Past trips and distant adventures.</h2>
-			
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-			
-			<!-- Column 1 /Content -->
-			<div class="grid_8">
-				
-				<!-- Blog Post -->
-				<div class="post">
-					<!-- Post Title -->
-                    <div style="float: left;">
-    					<h3 class="title"><c:out value="${trip.name}" /></h3>
-                    </div>
-                    <div style="float: right; padding-top: 8px;">
-                        <h4><a href="<c:url value="/trips/${slug}/popout" />" target="_blank">large map</a></h4>
-                    </div>
-                    <div class="clearfix">&nbsp;</div>
-
-					<!-- Post Data -->
-					<p class="sub">
-	                    <fmt:formatDate value="${trip.startDate}" /> - <fmt:formatDate value="${trip.endDate}" /> &bull; 
-	                    <c:out value="${trip.keywords}" /> <!--<a href="#">1 Comment</a>-->
-	                </p>
-					<div class="hr dotted clearfix">&nbsp;</div>
-					<!-- Post Image -->
-
-					<div id="map" class="thumb" style="margin-bottom: 15px;"></div>
-	                <!-- <img class="thumb" alt="" src="images/610x150.gif" /> -->
-					<!-- Post Content -->
-	                <p></p>
-	                <!--
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <b>Mauris vel porta erat.</b> Quisque sit amet risus at odio pellentesque sollicitudin. Proin suscipit molestie facilisis. Aenean vel massa magna. Proin nec lacinia augue. Mauris venenatis libero nec odio viverra consequat. In hac habitasse platea dictumst.</p>
-					<p>Cras vestibulum lorem et dui mollis sed posuere leo semper. Integer ac ultrices neque. Cras lacinia orci a augue tempor egestas. Sed cursus, sem ut vehicula vehicula, ipsum est mattis justo, at volutpat nibh arcu sit amet risus. Vestibulum tincidunt, eros ut commodo laoreet, arcu eros ultrices nibh, ac auctor est dui vel nibh.</p>
-	            	-->
+		
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		
+		<!-- Custom styles -->
+		<link href="/resources/css/bs/screen.css" rel="stylesheet">
+	</head>
+	
+	<body>
+		<!-- Navigation -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="<c:url value="/" />">Beau Grantham | Track</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarResponsive" aria-controls="navbarResponsive"
+					aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav ml-auto">
+						<li class="nav-item"><a class="nav-link" href="<c:url value="/" />">Home</a></li>
+						<li class="nav-item active"><a class="nav-link" href="<c:url value="/trips" />">Trips<span class="sr-only">(current)</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<!-- Page Content -->
+		<div class="container">
+	
+			<div class="row">
+	
+				<!-- Post Content Column -->
+				<div class="col-lg-8">
+	
+					<!-- Title -->
+					<h1 class="mt-4"><c:out value="${trip.name}" /></h1>
+	
+					<!-- Date/Time -->
+					<p><fmt:formatDate value="${trip.startDate}" /> - <fmt:formatDate value="${trip.endDate}" /></p>
+	
+					<hr>
+	
+					<!-- Preview Image -->
+					<div id="map"></div>
+	
 				</div>
 	
-	            <!--
-				<div class="hr clearfix">&nbsp;</div>
-	            -->
-				
-				<!-- Blog Navigation -->
-	            <!--
-				<p class="clearfix">
-					<a href="#" class="button float">&lt;&lt; Previous Posts</a>
-					<a href="#" class="button float right">Newer Posts >></a>
-				</p>
-	            -->
+				<!-- Sidebar Widgets Column -->
+				<div class="col-md-4">
+
+					<!-- Search Widget -->
+					<div class="card my-4">
+						<h5 class="card-header">Latest Positions</h5>
+						<div class="card-body">
+
+							<c:choose>
+								<c:when test="${empty points}">
+									No positions reported yet
+								</c:when>
+		
+								<c:otherwise>
+									<ul class="list-group">
+										<c:forEach var="i" begin="0" end="10">
+											<li class="list-group-item">
+												<c:out value="${points[10-i].reportedReverseGeocode}" /><br />
+												<fmt:formatDate value="${points[10-i].reportedTimestamp}" type="both" />
+											</li>
+										</c:forEach>
+									</ul>
+								</c:otherwise>
+							</c:choose>
+
+						</div>
+					</div>
+
+				</div>
+	
 			</div>
-			
-			<!-- Column 2 / Sidebar -->
-			<div class="grid_4">
-			
-				<h4>Latest positions</h4>
-				<ul class="sidebar">
-
-					<c:choose>
-						<c:when test="${empty points}">
-							No positions reported yet
-						</c:when>
-
-						<c:otherwise>
-							<c:forEach var="i" begin="0" end="10">
-								<li>
-									<c:out value="${points[10-i].reportedReverseGeocode}" /><br />
-									<fmt:formatDate value="${points[10-i].reportedTimestamp}" type="both" /><br />
-								</li>
-							</c:forEach>
-						</c:otherwise>
-					</c:choose>
-
-				</ul>
-				
+			<!-- /.row -->
+	
+		</div>
+		<!-- /.container -->
+	
+		<!-- Footer -->
+		<footer class="py-5 bg-dark">
+			<div class="container">
+				<p class="m-0 text-center text-white">Copyright &copy; Beau Grantham (<a href="https://www.granth.am/">granth.am</a>) 2018</p>
 			</div>
-			
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-			
-			<!-- Footer -->
-			<p class="grid_12 footer clearfix">
-				<span class="float"><b>&copy; Copyright</b> <a href="http://www.granth.am/">Beau Grantham (granth.am)</a></span>
-				<a class="float right" href="#">top</a>
-			</p>
-			
-		</div><!--end wrapper-->
-	    
+			<!-- /.container -->
+		</footer>
+	
+		<!-- Bootstrap core JavaScript -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		<!-- OpenLayers JS -->
+		<script src="<c:url value="/resources/js/ol.js" />"></script>
+		<script src="<c:url value="/resources/js/ol-popup.js" />"></script>
+		
 	    <script>
-			$(document).ready(function() {
+			$(document).ready(function() {				
 	    		// Main view
 				var view = new ol.View({
 					center: ol.proj.fromLonLat([<c:out value="${trip.mapCenterLongitude}" />, <c:out value="${trip.mapCenterLatitude}" />]),
@@ -143,7 +148,12 @@
 					layers: [
 						new ol.layer.Tile({
 							source: new ol.source.XYZ({
-								url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ'
+								url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
+								attributions: [
+									new ol.Attribution({
+										html: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
+									})
+								]
 							})
 						}),
 						<c:if test="${showWeather}">
@@ -156,7 +166,10 @@
 							}),
 		                </c:if>
 						kml
-					]
+					],
+					controls: ol.control.defaults().extend([
+						new ol.control.FullScreen()
+					])
 				});
 
 				// Feature popup
@@ -200,6 +213,17 @@
 					map.getTargetElement().style.cursor = hit ? 'pointer' : '';
 				});				
 			});
-	    </script>
-	</jsp:body>
-</t:site>
+	    </script>		
+
+		<script>
+		    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		    ga('create', 'UA-42864823-2', 'granth.am');
+		    ga('send', 'pageview');
+		</script>
+	</body>
+
+</html>

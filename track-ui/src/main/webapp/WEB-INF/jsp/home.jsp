@@ -1,87 +1,112 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ page session="false" %>
 
-<t:site>
-	<jsp:attribute name="title">Beau Grantham | Track</jsp:attribute>
+<!DOCTYPE html>
+<html lang="en">
 
-	<jsp:attribute name="header">
-		<script src="<c:url value="/resources/js/jquery.roundabout-1.0.min.js" />"></script> 
-		<script src="<c:url value="/resources/js/jquery.easing.1.3.js" />"></script>
-		<script>		
-			$(document).ready(function() { //Start up our Featured Project Carosuel
-				$('#featured ul').roundabout({
-					easing: 'easeOutInCirc',
-					duration: 600
-				});
-			});
+	<head>	
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="Beau Grantham">
+		
+		<title>Beau Grantham | Track</title>
+		
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		
+		<!-- Custom styles -->
+		<link href="/resources/css/bs/screen.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<!-- Navigation -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="<c:url value="/" />">Beau Grantham | Track</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarResponsive" aria-controls="navbarResponsive"
+					aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav ml-auto">
+						<li class="nav-item active"><a class="nav-link" href="<c:url value="/" />">Home<span class="sr-only">(current)</span></a></li>
+						<li class="nav-item"><a class="nav-link" href="<c:url value="/trips" />">Trips</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	
+		<!-- Page Content -->
+		<div class="container">
+ 
+			<!-- Portfolio Item Heading -->
+			<h1 class="my-4"></h1>
+
+			<!-- Portfolio Item Row -->
+			<div class="row">
+	
+				<div class="col-md-8">
+					<img class="img-fluid rounded" src="<c:url value="/trips/${trips[0].slug}.jpg" />" alt="" />
+				</div>
+	
+				<div class="col-md-4">
+					<h2 class="my-3"><c:out value="${trips[0].name}" /></h2>
+					<p><c:out value="${trips[0].description}" /></p>
+					<a href="<c:url value="/trips/${trips[0].slug}" />" class="btn btn-primary float-left">View Trip</a>
+				</div>
+	
+			</div>
+			<!-- /.row -->
+	
+			<!-- Related Projects Row -->
+			<h3 class="my-4">Related Trips</h3>
+
+			<div class="row">
+				<c:forEach var="i" begin="1" end="4">
+					<div class="col-lg-3 col-md-6 mb-4">
+						<div class="card">
+							<img class="card-img-top" src="<c:url value="/trips/${trips[i].slug}.jpg" />" alt="">
+							<div class="card-body">
+								<h5 class="card-title"><c:out value="${trips[i].name}" /></h5>
+								<p class="card-text"><c:out value="${trips[i].description}" /></p>
+							</div>
+							<div class="card-footer">
+								<a href="#" class="btn btn-primary">View Trip</a>
+							</div>
+						</div>
+					</div>
+				</c:forEach>
+			</div>
+			<!-- /.row -->
+	
+		</div>
+		<!-- /.container -->
+	
+		<!-- Footer -->
+		<footer class="py-5 bg-dark">
+			<div class="container">
+				<p class="m-0 text-center text-white">Copyright &copy; Beau Grantham (<a href="https://www.granth.am/">granth.am</a>) 2018</p>
+			</div>
+			<!-- /.container -->
+		</footer>
+	
+		<!-- Bootstrap core JavaScript -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		<script>
+		    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		    ga('create', 'UA-42864823-2', 'granth.am');
+		    ga('send', 'pageview');
 		</script>
-	</jsp:attribute>
+	</body>
 
-	<jsp:body>
-		<div id="wrapper" class="container_12 clearfix">
-	
-			<!-- Text Logo -->
-			<h1 id="logo" class="grid_4"><a href="<c:url value="/" />" style="color: #000000;">track</a></h1>
-			
-			<!-- Navigation Menu -->
-			<ul id="navigation" class="grid_8">
-				<li><a href="<c:url value="/trips" />"><span class="meta">Past adventures</span><br />Trips</a></li>
-				<li><a href="<c:url value="/" />" class="current"><span class="meta">Homepage&nbsp;&nbsp;</span><br />Home</a></li>
-			</ul>
-			
-			<div class="hr grid_12">&nbsp;</div>
-			<div class="clear"></div>
-			
-			<!-- Featured Image Slider -->
-			<div id="featured" class="clearfix grid_12">
-				<ul> 
-					<c:forEach var="trip" items="${trips}">
-						<li>
-							<a href="<c:url value="/trips/${trip.slug}" />">
-								<span><c:out value="${trip.name}" /></span>
-								<img src="<c:url value="/trips/${trip.slug}.jpg" />" alt="" />
-							</a>
-						</li>  
-					</c:forEach>
-				</ul> 
-			</div>
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-				
-			<!-- Caption Line -->
-			<h2 class="grid_12 caption clearfix" style="text-align: center;">Welcome! This is where you can follow Beau Grantham on his travel adventures.</h2>
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-			
-			<!-- Section 3 -->
-			<div class="catagory_1 clearfix">
-				<!-- Row 1 -->
-				<div class="grid_3 textright" >
-					<span class="meta"><c:out value="${category.keywords}" /></span>
-					<h4 class="title "><c:out value="${category.title}" /></h4>
-					<div class="hr clearfix dotted">&nbsp;</div>
-					<p><c:out value="${category.description}" /></p>
-				</div>
-				<div class="grid_9">
-					<c:forEach var="trip" items="${trips}" varStatus="status">
-                        <c:if test="${status.index % 3 == 0}"><br /></c:if>
-						<a class="portfolio_item float alpha" href="<c:url value="/trips/${trip.slug}" />">
-							<span><c:out value="${trip.shortName}" /></span>
-							<img class="" src="<c:url value="/trips/${trip.slug}.jpg" />"  alt=""/>
-						</a>
-					</c:forEach>
-				</div>
-			</div>
-	
-			<div class="hr grid_12 clearfix quicknavhr">&nbsp;</div>
-	
-			<div class="hr grid_12 clearfix">&nbsp;</div>
-			<!-- Footer -->
-	        <p class="grid_12 footer clearfix">
-				<!-- <span class="float"><b>&copy; Copyright</b> <a href="">QwibbleDesigns</a> - remove upon purchase.</span> -->
-				<span class="float"><b>&copy; Copyright</b> <a href="http://www.granth.am/">Beau Grantham (granth.am)</a>.</span>
-				<a class="float right" href="#">top</a>
-			</p>
-	
-		</div><!--end wrapper-->
-	</jsp:body>
-</t:site>
+</html>

@@ -45,6 +45,8 @@ public class TripController {
 	/**
 	 * View for displaying all trips.
 	 * 
+	 * Exclude the featured category (front-page only).
+	 * 
 	 * @param model
 	 *            The {@link Model} object.
 	 * @return the view displaying all trips.
@@ -54,15 +56,17 @@ public class TripController {
 		Map<Category, List<Trip>> categoryTripMap = new LinkedHashMap<Category, List<Trip>>();
 
 		for (Category c : categoryService.getCategories()) {
-			List<Trip> trips = new ArrayList<>(c.getTrips());
-
-			Collections.sort(trips, new Comparator<Trip>() {
-				public int compare(Trip t1, Trip t2) {
-					return t2.getStartDate().compareTo(t1.getStartDate());
-				}
-			});
-			
-			categoryTripMap.put(c, trips);
+			if (!c.getTitle().equalsIgnoreCase("Featured")) {
+				List<Trip> trips = new ArrayList<>(c.getTrips());
+	
+				Collections.sort(trips, new Comparator<Trip>() {
+					public int compare(Trip t1, Trip t2) {
+						return t2.getStartDate().compareTo(t1.getStartDate());
+					}
+				});
+				
+				categoryTripMap.put(c, trips);
+			}
 		}
 
 		model.addAttribute("categoryTripMap", categoryTripMap);
@@ -119,7 +123,7 @@ public class TripController {
 		model.addAttribute("timestamp", timestamp);
 		model.addAttribute("showWeather", now.before(trip.getEndDate()) ? true : false);
 
-		return "bs/trip";
+		return "trip";
 	}
 	               
 	/**
