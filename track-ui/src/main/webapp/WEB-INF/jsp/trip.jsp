@@ -62,7 +62,11 @@
 	
 					<!-- Preview Image -->
 					<div id="map"></div>
-	
+
+					<hr>
+
+					<!-- Post Content -->
+					<p><c:out value="${trip.description}" /></p>
 				</div>
 	
 				<!-- Sidebar Widgets Column -->
