@@ -42,32 +42,27 @@
 	
 		<!-- Page Content -->
 		<div class="container">
-	
+ 
 			<!-- Portfolio Item Heading -->
+ 
 			<h1 class="my-4">
-				<c:out value="${trips[0].name}" />
+				
 			</h1>
+	
+	
+
 	
 			<!-- Portfolio Item Row -->
 			<div class="row">
 	
 				<div class="col-md-8">
-					<a href="<c:url value="/trips/${trips[0].slug}" />"><img class="img-fluid" src="<c:url value="/trips/${trips[0].slug}.jpg" />" alt=""></a>
+					<img class="img-fluid" src="<c:url value="/trips/${trips[0].slug}.jpg" />" alt="" />
 				</div>
 	
 				<div class="col-md-4">
-					<h3 class="my-3">Project Description</h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
-						viverra euismod odio, gravida pellentesque urna varius vitae. Sed
-						dui lorem, adipiscing in adipiscing et, interdum nec metus. Mauris
-						ultricies, justo eu convallis placerat, felis enim.</p>
-					<h3 class="my-3">Project Details</h3>
-					<ul>
-						<li>Lorem Ipsum</li>
-						<li>Dolor Sit Amet</li>
-					</ul>
-					
-					<a href="<c:url value="/trips" />" class="btn btn-primary">View More Trips</a>
+					<h2 class="my-3"><c:out value="${trips[0].name}" /></h2>
+					<p><c:out value="${trips[0].description}" /></p>
+					<a href="<c:url value="/trips/${trips[0].slug}" />" class="btn btn-primary float-left">View Trip</a>
 				</div>
 	
 			</div>
@@ -82,11 +77,11 @@
 						<div class="card">
 							<img class="card-img-top" src="<c:url value="/trips/${trips[i].slug}.jpg" />" alt="">
 							<div class="card-body">
-								<h4 class="card-title"><c:out value="${trips[i].name}" /></h4>
+								<h5 class="card-title"><c:out value="${trips[i].name}" /></h5>
 								<p class="card-text"><c:out value="${trips[i].description}" /></p>
 							</div>
 							<div class="card-footer">
-								<a href="#" class="btn btn-primary">View Trip</a>
+								<a href="#" class="btn btn-primary float-right">View Trip</a>
 							</div>
 						</div>
 					</div>
