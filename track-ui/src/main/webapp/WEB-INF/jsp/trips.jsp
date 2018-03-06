@@ -51,7 +51,7 @@
 					<!-- Project -->
 					<div class="row">
 						<div class="col-md-7">
-							<img class="img-fluid rounded mb-3 mb-md-0" src="<c:url value="/trips/${trip.slug}.jpg" />" alt="">
+							<img class="img-fluid rounded mb-3 mb-md-0" src="<c:url value="/trips/${trip.slug}.png" />" alt="">
 						</div>
 						<div class="col-md-5">
 							<h3><c:out value="${trip.name}" /></h3>

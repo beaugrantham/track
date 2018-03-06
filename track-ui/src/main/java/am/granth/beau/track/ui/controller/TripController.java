@@ -125,6 +125,22 @@ public class TripController {
 
 		return "trip";
 	}
+	
+	/**
+	 * View for robots to grab map snapshots.
+	 * 
+	 * @param model
+	 *            The {@link Model} object.
+	 * @param slug
+	 *            The trip slug.
+	 * @return the map view.
+	 */
+	@RequestMapping(value = "/{slug}/map", method = RequestMethod.GET)
+	public String getMap(Model model, @PathVariable("slug") String slug) {
+		getTrip(model, slug);
+		
+		return "map";
+	}
 	               
 	/**
 	 * Display thumbnail image for a trip.
@@ -133,7 +149,7 @@ public class TripController {
 	 *            The trip slug.
 	 * @return the image as raw binary data.
 	 */
-	@RequestMapping(value="/{slug}.jpg", produces=MediaType.IMAGE_JPEG_VALUE)
+	@RequestMapping(value="/{slug}.png", produces=MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] thumbnail(@PathVariable("slug") String slug) {
 		Trip trip = tripService.getBySlug(slug);
 		return trip.getThumbnail();
