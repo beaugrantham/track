@@ -74,7 +74,7 @@
 								<p class="card-text"><c:out value="${trips[i].description}" /></p>
 							</div>
 							<div class="card-footer">
-								<a href="#" class="btn btn-primary">View Trip</a>
+								<a href="<c:url value="/trips/${trips[i].slug}" />" class="btn btn-primary">View Trip</a>
 							</div>
 						</div>
 					</div>
