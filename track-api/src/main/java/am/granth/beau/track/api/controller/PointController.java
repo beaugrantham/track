@@ -1,4 +1,4 @@
-package am.granth.beau.track.rest.controller;
+package am.granth.beau.track.api.controller;
 
 import java.math.BigDecimal;
 import java.text.Format;
@@ -29,10 +29,10 @@ import am.granth.beau.track.entity.User;
  * @author Beau Grantham
  */
 @RestController
-@RequestMapping(value = "/publish")
-public class PublishController {
+@RequestMapping(value = "/api/v1/points")
+public class PointController {
 
-	private static final Logger logger = LoggerFactory.getLogger(PublishController.class);
+	private static final Logger logger = LoggerFactory.getLogger(PointController.class);
 
 	private static final Relation relation = new Relation(3); // VERSION 2 UNKNOWN
 	private static final String reverseGeocode = "Geocoding...";

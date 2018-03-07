@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>track-rest</artifactId>
-	<name>track-rest</name>
-	<description>REST service for track data</description>
+	<artifactId>track-api</artifactId>
+	<name>track-api</name>
+	<description>API for track data</description>
 	<packaging>jar</packaging>
 
 	<parent>

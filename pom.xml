@@ -20,6 +20,6 @@
 	<modules>
 		<module>track-ui</module>
 		<module>track-repository</module>
-		<module>track-rest</module>
+		<module>track-api</module>
 	</modules>
 </project>
