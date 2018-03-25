@@ -32,4 +32,13 @@ public interface PointDao extends CrudRepository<Point, Integer> {
 	 */
 	List<Point> findByUserAndRelationIdGreaterThanAndReportedTimestampBetweenOrderByIdDesc(User user, int relation, Date fromDate, Date toDate);
 
+	/**
+	 * Find the most recent {@link Point} with the given reverse geocode.
+	 * 
+	 * @param reportedReverseGeocode
+	 *            The reverse geocode to lookup.
+	 * @return the most recent matching {@link Point}.
+	 */
+	Point findFirstByReportedReverseGeocodeOrderByIdDesc(String reportedReverseGeocode);
+	  
 }

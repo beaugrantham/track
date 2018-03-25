@@ -59,6 +59,12 @@
 			<artifactId>gson</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20180130</version>
+		</dependency>		
 
 		<!-- -->
 
