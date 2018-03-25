@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>am.granth.beau</groupId>
 		<artifactId>track</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>2.0.0.RELEASE</version>
 	</parent>
 
 	<dependencies>
