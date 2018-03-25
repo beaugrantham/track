@@ -21,7 +21,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		
 		<!-- Custom styles -->
-		<link href="/resources/css/bs/screen.css" rel="stylesheet">
+		<link href="/resources/css/screen.css" rel="stylesheet">
 	</head>
 	
 	<body>
@@ -121,44 +121,90 @@
 		<script src="<c:url value="/resources/js/ol-popup.js" />"></script>
 		
 	    <script>
-			$(document).ready(function() {				
-	    		// Main view
-				var view = new ol.View({
-					center: ol.proj.fromLonLat([<c:out value="${trip.mapCenterLongitude}" />, <c:out value="${trip.mapCenterLatitude}" />]),
-					zoom: <c:out value="${trip.mapZoom}" />
+			$(document).ready(function() {
+				window.app = {};
+				var app = window.app;
+				
+				// Attribution
+				var attribution = new ol.Attribution({
+					html: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 				});
-
+				
+				// Streets source (default)
+				var streetSource = new ol.source.XYZ({
+					url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
+					attributions: [ attribution ]
+				});
+				
+				// Satellite source (optional)
+				var satelliteSource = new ol.source.XYZ({
+					url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
+					attributions: [ attribution ]
+				});
+				
+				// Base tile layer
+				var baseTileLayer = new ol.layer.Tile({
+					source: streetSource
+				});
+				
 				// KML source
-				var source = new ol.source.Vector({
+				var kmlSource = new ol.source.Vector({
 					url: '<c:url value="/kml" />/<c:out value="${slug}" />/<c:out value="${timestamp}" />.kml',
 					format: new ol.format.KML()
 				});
 
 				// Fit map to KML content
-				source.on('change', function() {
+				kmlSource.on('change', function()  {
 					view.fit(this.getExtent());
 				});
 
 				// KML layer
-				var kml = new ol.layer.Vector({
-					source: source
+				var kmlLayer = new ol.layer.Vector({
+					source: kmlSource
 				});
-
+				
+				// Layer switching control
+				app.SwitchLayerControl = function() {
+					var button = document.createElement('button');
+					button.innerHTML = '1';	// TODO - improve button
+					
+					var this_ = this;
+					var handleSwitchLayer = function() {
+						if (baseTileLayer.getSource() === streetSource) {
+							baseTileLayer.setSource(satelliteSource);
+							button.innerHTML = '2';	// TODO - improve button
+						} else {
+							baseTileLayer.setSource(streetSource);
+							button.innerHTML = '1';	// TODO - improve button
+						}
+					}
+					
+					button.addEventListener('click', handleSwitchLayer, false);
+					button.addEventListener('touchstart', handleSwitchLayer, false);
+					
+					var element = document.createElement('div');
+					element.className = 'switch-layer ol-unselectable ol-control';
+					element.appendChild(button);
+					
+					ol.control.Control.call(this, {
+						element: element
+					});					
+				};
+				
+				ol.inherits(app.SwitchLayerControl, ol.control.Control);
+				
+				// Main view
+				var view = new ol.View({
+					center: ol.proj.fromLonLat([<c:out value="${trip.mapCenterLongitude}" />, <c:out value="${trip.mapCenterLatitude}" />]),
+					zoom: <c:out value="${trip.mapZoom}" />
+				});
+				
 				// Map
 				var map = new ol.Map({
 					target: 'map',
 					view: view,
 					layers: [
-						new ol.layer.Tile({
-							source: new ol.source.XYZ({
-								url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
-								attributions: [
-									new ol.Attribution({
-										html: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
-									})
-								]
-							})
-						}),
+						baseTileLayer,
 						<c:if test="${showWeather}">
 					        new ol.layer.Tile({
 								source: new ol.source.TileWMS({
@@ -168,10 +214,11 @@
 					            opacity: 0.7
 							}),
 		                </c:if>
-						kml
+						kmlLayer
 					],
 					controls: ol.control.defaults().extend([
-						new ol.control.FullScreen()
+						new ol.control.FullScreen(),
+						new app.SwitchLayerControl()
 					])
 				});
 
