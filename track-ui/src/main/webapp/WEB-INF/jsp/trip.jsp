@@ -135,12 +135,14 @@
 					url: 'https://api.mapbox.com/styles/v1/beaugrantham/cjd6oanie7ay02rp4ogjyaxmj/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
 					attributions: [ attribution ]
 				});
+				streetSource.set('source-name', 'Street');	// custom property used for layer switching control
 				
 				// Satellite source (optional)
 				var satelliteSource = new ol.source.XYZ({
 					url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmVhdWdyYW50aGFtIiwiYSI6InZHQlQwY00ifQ.eKpjZmiLKGfU0OAy2AuFzQ',
 					attributions: [ attribution ]
 				});
+				satelliteSource.set('source-name', 'Satellite');	// custom property used for layer switching control
 				
 				// Base tile layer
 				var baseTileLayer = new ol.layer.Tile({
@@ -166,16 +168,16 @@
 				// Layer switching control
 				app.SwitchLayerControl = function() {
 					var button = document.createElement('button');
-					button.innerHTML = '1';	// TODO - improve button
+					button.innerHTML = satelliteSource.get('source-name');
 					
 					var this_ = this;
 					var handleSwitchLayer = function() {
+						button.innerHTML = baseTileLayer.getSource().get('source-name');
+						
 						if (baseTileLayer.getSource() === streetSource) {
 							baseTileLayer.setSource(satelliteSource);
-							button.innerHTML = '2';	// TODO - improve button
 						} else {
 							baseTileLayer.setSource(streetSource);
-							button.innerHTML = '1';	// TODO - improve button
 						}
 					}
 					
@@ -190,7 +192,6 @@
 						element: element
 					});					
 				};
-				
 				ol.inherits(app.SwitchLayerControl, ol.control.Control);
 				
 				// Main view
