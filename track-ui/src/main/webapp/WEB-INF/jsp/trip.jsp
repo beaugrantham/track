@@ -85,8 +85,8 @@
 									<ul class="list-group">
 										<c:forEach var="i" begin="0" end="10">
 											<li class="list-group-item">
-												<c:out value="${points[10-i].reportedReverseGeocode}" /><br />
-												<fmt:formatDate value="${points[10-i].reportedTimestamp}" type="both" />
+												<c:out value="${points[i].reportedReverseGeocode}" /><br />
+												<span class="date-time"><fmt:formatDate value="${points[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /></span>
 											</li>
 										</c:forEach>
 									</ul>
@@ -122,6 +122,11 @@
 		
 	    <script>
 			$(document).ready(function() {
+				$(".date-time").each(function() {
+					var date = new Date($(this).text());
+					$(this).text(date.toLocaleString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }));
+				})
+				
 				window.app = {};
 				var app = window.app;
 				
@@ -264,7 +269,7 @@
 					map.getTargetElement().style.cursor = hit ? 'pointer' : '';
 				});				
 			});
-	    </script>		
+	    </script>
 
 		<script>
 		    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
