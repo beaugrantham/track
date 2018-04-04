@@ -187,7 +187,6 @@
 					}
 					
 					button.addEventListener('click', handleSwitchLayer, false);
-					button.addEventListener('touchstart', handleSwitchLayer, false);
 					
 					var element = document.createElement('div');
 					element.className = 'switch-layer ol-unselectable ol-control';
@@ -222,10 +221,11 @@
 		                </c:if>
 						kmlLayer
 					],
-					controls: ol.control.defaults().extend([
+					controls: ol.control.defaults({rotate: false}).extend([
 						new ol.control.FullScreen(),
 						new app.SwitchLayerControl()
-					])
+					]),
+					interactions: ol.interaction.defaults({altShiftDragRotate:false, pinchRotate:false})
 				});
 
 				// Feature popup
