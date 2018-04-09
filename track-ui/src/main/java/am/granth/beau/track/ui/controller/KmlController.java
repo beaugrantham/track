@@ -10,6 +10,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ import de.micromata.opengis.kml.v_2_2_0.Kml;
 import de.micromata.opengis.kml.v_2_2_0.KmlFactory;
 import de.micromata.opengis.kml.v_2_2_0.LineString;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
+import de.micromata.opengis.kml.v_2_2_0.Schema;
 import de.micromata.opengis.kml.v_2_2_0.Style;
 import de.micromata.opengis.kml.v_2_2_0.Units;
 import de.micromata.opengis.kml.v_2_2_0.Vec2;
@@ -44,6 +46,9 @@ public class KmlController {
 	private static final Logger logger = LoggerFactory.getLogger(KmlController.class);
 
 	public static final int MAX_ROWS = 500;
+	
+	@Value("${application.root}")
+	private String applicationRoot;
 
 	@Autowired
 	private TripService tripService;
@@ -92,6 +97,14 @@ public class KmlController {
 		Kml kml = KmlFactory.createKml();
 		Document document = kml.createAndSetDocument();
 
+		Schema mediaDataSchema = document.createAndAddSchema()
+				.withId("mediaData")
+				.withName("mediaData");
+		
+		mediaDataSchema.createAndAddSimpleField()
+				.withName("media")
+				.withType("string");
+		
 		Vec2 iconHotspot = new Vec2()
 				.withX(0.5).withXunits(Units.FRACTION)
 				.withY(0).withYunits(Units.FRACTION);
@@ -108,9 +121,14 @@ public class KmlController {
 				.withHotSpot(iconHotspot)
 				.withScale(0.7);
 
+		final Style styleMediaWaymark = document.createAndAddStyle().withId("styleMediaWaymark");
+		styleMediaWaymark.createAndSetIconStyle()
+				.withIcon(new Icon().withHref("https://maps.google.com/mapfiles/kml/pal4/icon38.png"))
+				.withScale(0.7);
+		
 		final Style styleLive = document.createAndAddStyle().withId("styleLive");
 		styleLive.createAndSetIconStyle()
-				.withIcon(new Icon().withHref("https://track.beau.granth.am/resources/img/red_circle.png"))
+				.withIcon(new Icon().withHref(applicationRoot + "/resources/img/red_circle.png"))
 				.withScale(1);
 
 		final Style trackStyle = document.createAndAddStyle().withId("stylePath");
@@ -138,11 +156,19 @@ public class KmlController {
 				if (!StringUtils.isEmpty(p.getAnnotation())) {
 					Placemark waymarkPlacemark = document.createAndAddPlacemark()
 							.withDescription(p.getAnnotation())
-							.withStyleUrl("#styleWaymark");
-
+							.withStyleUrl(p.getMedia() == null ? "#styleWaymark" : "#styleMediaWaymark");
+							
 					waymarkPlacemark.createAndSetPoint().addToCoordinates(
 							Double.parseDouble(p.getReportedLongitude().toString()),
 							Double.parseDouble(p.getReportedLatitude().toString()));
+
+					if (p.getMedia() != null) {
+						waymarkPlacemark.createAndSetExtendedData()
+								.createAndAddSchemaData()
+								.withSchemaUrl("#mediaData")
+								.createAndAddSimpleData("media")
+								.setValue(applicationRoot + "/trips/" + slug + "/media/" + p.getId() + ".jpg");
+					}
 				}
 			}
 

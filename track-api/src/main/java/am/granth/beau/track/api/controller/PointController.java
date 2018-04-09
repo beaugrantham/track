@@ -3,6 +3,7 @@ package am.granth.beau.track.api.controller;
 import java.math.BigDecimal;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -84,16 +85,18 @@ public class PointController {
 			Double longitude = Double.parseDouble(entry.getValue().get("longitude"));
 			Double accuracy = Double.parseDouble(entry.getValue().get("accuracy"));
 			String annotation = entry.getValue().get("annotation");
+			String media = entry.getValue().get("media");
 
-			logger.info("   " + "speed      : " + entry.getValue().get("speed"));
-			logger.info("   " + "direction  : " + entry.getValue().get("direction"));
-			logger.info("   " + "altitude   : " + entry.getValue().get("altitude"));
-			logger.info("   " + "latitude   : " + latitude);
-			logger.info("   " + "longitude  : " + longitude);
-			logger.info("   " + "satellites : " + entry.getValue().get("satellites"));
-			logger.info("   " + "accuracy   : " + accuracy);
-			logger.info("   " + "annotation : " + annotation);
-
+			logger.info("   speed      : " + entry.getValue().get("speed"));
+			logger.info("   direction  : " + entry.getValue().get("direction"));
+			logger.info("   altitude   : " + entry.getValue().get("altitude"));
+			logger.info("   latitude   : " + latitude);
+			logger.info("   longitude  : " + longitude);
+			logger.info("   satellites : " + entry.getValue().get("satellites"));
+			logger.info("   accuracy   : " + accuracy);
+			logger.info("   annotation : " + annotation);
+			logger.info("   media      : " + (media != null ? media.length() : 0) + " bytes");
+			
 			Point point = new Point();
 			point.setUser(new User(user));
 			point.setReportedTimestamp(date);
@@ -103,6 +106,7 @@ public class PointController {
 			point.setReportedReverseGeocode(reverseGeocode);
 			point.setMinutesReported(minutesReported);
 			point.setAnnotation(annotation);
+			point.setMedia(media != null ? Base64.getDecoder().decode(media.getBytes()) : null);
 			point.setRelation(relation);
 
 			pointDao.save(point);

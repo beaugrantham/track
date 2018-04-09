@@ -23,6 +23,7 @@ import am.granth.beau.track.entity.Category;
 import am.granth.beau.track.entity.Point;
 import am.granth.beau.track.entity.Trip;
 import am.granth.beau.track.ui.service.CategoryService;
+import am.granth.beau.track.ui.service.PointService;
 import am.granth.beau.track.ui.service.TripService;
 
 /**
@@ -41,6 +42,9 @@ public class TripController {
 
 	@Autowired
 	private CategoryService categoryService;
+	
+	@Autowired
+	private PointService pointService;
 
 	/**
 	 * View for displaying all trips.
@@ -140,6 +144,13 @@ public class TripController {
 		getTrip(model, slug);
 		
 		return "map";
+	}
+	
+	@RequestMapping(value="/{slug}/media/{id}.jpg", produces=MediaType.IMAGE_JPEG_VALUE)
+	public @ResponseBody byte[] media(@PathVariable("id") int id) {
+		Point point = pointService.getPoint(id);
+
+		return point != null ? point.getMedia() : null;
 	}
 	               
 	/**

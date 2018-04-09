@@ -34,6 +34,7 @@ public class Point implements java.io.Serializable {
 	private String reportedReverseGeocode;
 	private int minutesReported;
 	private String annotation;
+	private byte[] media;
 	private Date entryDate;
 	private Date modifiedDate;
 
@@ -129,6 +130,15 @@ public class Point implements java.io.Serializable {
 
 	public void setAnnotation(String annotation) {
 		this.annotation = annotation;
+	}
+	
+	@Column(name = "media", unique = false, nullable = true, insertable = true, updatable = true)
+	public byte[] getMedia() {
+		return media;
+	}
+	
+	public void setMedia(byte[] media) {
+		this.media = media;
 	}
 
 	@Column(name = "entry_date", unique = false, nullable = false, insertable = true, updatable = true, length = 19)
