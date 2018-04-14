@@ -31,11 +31,26 @@ public interface PointDao extends CrudRepository<Point, Integer> {
 	 * @param relation
 	 *            The relationship which to exceed.
 	 * @return a {@link List} of {@link Point}s matching the specified criteria
-	 *         ordered by ID ascending.
+	 *         ordered by ID descending.
 	 */
-	@Query("select p from Point p where p.user = ?1 and p.reportedTimestamp between ?2 and ?3 and (p.relation.id > ?4 or p.annotation != null)")
+	@Query("select p from Point p where p.user = ?1 and p.reportedTimestamp between ?2 and ?3 and (p.relation.id > ?4 or p.annotation != null) order by p.id desc")
 	List<Point> findByUserAndReportedTimestampBetweenAndRelationIdGreaterThanOrderByIdDesc(User user, Date fromDate, Date toDate, int relation);
 
+	/**
+	 * Find all {@link Point}s with the specified parameters. The returned list is
+	 * ordered by ID descending.
+	 * 
+	 * @param user
+	 *            The {@link User} to which the point belongs.
+	 * @param fromDate
+	 *            The minimum date.
+	 * @param toDate
+	 *            The maximum date.
+	 * @return a {@link List} of {@link Point}s matching the specified criteria
+	 *         ordered by ID descending.
+	 */
+	List<Point> findByUserAndReportedTimestampBetweenAndMediaIsNotNullOrderByIdDesc(User user, Date fromDate, Date toDate);
+	
 	/**
 	 * Find the most recent {@link Point} with the given reverse geocode.
 	 * 

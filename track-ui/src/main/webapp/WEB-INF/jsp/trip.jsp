@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page session="false" %>
 
 <!DOCTYPE html>
@@ -46,35 +47,72 @@
 			</div>
 		</nav>
 	
-		<!-- Page Content -->
+		<!-- Page content -->
 		<div class="container">
 	
 			<div class="row">
 	
-				<!-- Post Content Column -->
+				<!-- Main column -->
 				<div class="col-lg-8">
 	
 					<!-- Title -->
 					<h1 class="mt-4"><c:out value="${trip.name}" /></h1>
 	
-					<!-- Date/Time -->
+					<!-- Dates -->
 					<p><fmt:formatDate value="${trip.startDate}" /> - <fmt:formatDate value="${trip.endDate}" /></p>
 	
-					<hr>
+					<hr />
 	
-					<!-- Preview Image -->
+					<!-- Map -->
 					<div id="map"></div>
 
-					<hr>
+					<hr />
 
-					<!-- Post Content -->
+					<!-- Description -->
 					<p><c:out value="${trip.description}" /></p>
+					
+					<c:if test="${not empty media}">
+						<hr />
+						
+						<!-- Media -->
+						<div class="card my-4">
+							<h5 class="card-header">Media</h5>
+							<div class="card-body">
+ 								<div class="row">
+									<c:forEach var="i" begin="0" end="${fn:length(media) > 4 ? 3 : fn:length(media) - 1}">
+										<a href="<c:url value="${trip.slug}/media/${media[i].id}.jpg" />"
+											data-toggle="lightbox" 
+											data-gallery="media-gallery" 
+											data-title="${media[i].annotation}" 
+											data-footer="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /> @ ${media[i].reportedReverseGeocode}" 
+											class="col-sm-3">
+											<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid rounded" style="margin-bottom: 15px;">
+										</a>
+									</c:forEach>
+									
+									<c:if test="${fn:length(media) > 4}">
+										<c:forEach var="i" begin="4" end="${fn:length(media) - 1}">										
+											<div 
+												data-toggle="lightbox" 
+												data-gallery="media-gallery" 
+												data-title="${media[i].annotation}" 
+												data-footer="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /> @ ${media[i].reportedReverseGeocode}" 
+												data-remote="<c:url value="${trip.slug}/media/${media[i].id}.jpg" />"></div>
+										</c:forEach>
+									</c:if>
+								</div>
+							</div>
+							<div class="card-footer">
+								<a href="<c:url value="/trips/${trip.slug}/media" />" class="btn btn-primary float-right">View More</a>
+							</div>
+						</div>
+					</c:if>
 				</div>
 	
-				<!-- Sidebar Widgets Column -->
+				<!-- Sidebar column -->
 				<div class="col-md-4">
 
-					<!-- Search Widget -->
+					<!-- History -->
 					<div class="card my-4">
 						<h5 class="card-header">Latest Positions</h5>
 						<div class="card-body">
@@ -121,7 +159,7 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-		<!-- ekko-lightroom JS -->
+		<!-- ekko-lightbox JS -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
 
 		<!-- OpenLayers JS -->
@@ -130,10 +168,24 @@
 		
 	    <script>
 			$(document).ready(function() {
+				// Convert ISO8601 UTC date/time to local date/time
+				var localizeDate = function(utc) {
+					var date = new Date(utc);
+					return date.toLocaleString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+				};
+				
+				// Convert date/time to local (history)
 				$(".date-time").each(function() {
-					var date = new Date($(this).text());
-					$(this).text(date.toLocaleString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' }));
-				})
+					$(this).text(localizeDate($(this).text()));
+				});
+				
+				// Convert date/time to local (media)
+				$('*[data-footer]').filter(function() {
+					return $(this).attr('data-footer').match(/^\S+T\S+Z\s@\s.*$/);
+				}).each(function(e) {
+					var text = $(this).attr('data-footer').split('@', 2);
+					$(this).attr('data-footer', localizeDate(text[0].trim()) + ' @ ' + text[1].trim());
+				});
 				
 				window.app = {};
 				var app = window.app;
@@ -204,6 +256,7 @@
 						element: element
 					});					
 				};
+				
 				ol.inherits(app.SwitchLayerControl, ol.control.Control);
 				
 				// Main view
@@ -250,7 +303,8 @@
 					if (feature) {
 						if (feature.get('media') !== undefined) {
 						    $("#media")
-					    		.attr("data-footer", feature.get('description'))
+						    	.attr("data-title", feature.get('description'))
+					    		.attr("data-footer", localizeDate(feature.get('datetime')) + ' @ ' + feature.get('location'))
 					    		.attr("data-remote", feature.get('media'))
 					    		.ekkoLightbox();
 						} else {
@@ -283,6 +337,12 @@
 
 					map.getTargetElement().style.cursor = hit ? 'pointer' : '';
 				});				
+			});
+			
+			// Enable ekko-lightbox
+			$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+				event.preventDefault();
+				$(this).ekkoLightbox();
 			});
 	    </script>
 

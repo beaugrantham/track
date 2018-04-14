@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,9 +109,15 @@ public class TripController {
 		logger.debug("  Trip dates: " + trip.getStartDate() + " -> " + trip.getEndDate());
 		logger.debug("  Trip points: " + points.size());
 
+		List<Point> media = points.stream()
+				.filter(point -> point.getMedia() != null)
+				.collect(Collectors.toList());
+		
 		/*
-		 * Set the timestamp (for KML caching) to either a) trip start date b) latest
-		 * point date c) trip end date <- this one removes the current location marker
+		 * Set the timestamp (for KML caching) to either 
+		 * a) trip start date 
+		 * b) latest point date 
+		 * c) trip end date <- this one removes the current location marker
 		 */
 		if (points.isEmpty()) {
 			timestamp = trip.getStartDate().getTime();
@@ -124,10 +131,45 @@ public class TripController {
 		model.addAttribute("slug", slug);
 		model.addAttribute("trip", trip);
 		model.addAttribute("points", points);
+		model.addAttribute("media", media);
 		model.addAttribute("timestamp", timestamp);
 		model.addAttribute("showWeather", now.before(trip.getEndDate()) ? true : false);
 
 		return "trip";
+	}
+	
+	/**
+	 * View for displaying a trip media.
+	 * 
+	 * @param model
+	 *            The {@link Model} object.
+	 * @param slug
+	 *            The trip slug.
+	 * @return the view for a trip media, or a redirect if not found.
+	 */
+	@RequestMapping(value = "/{slug}/media", method = RequestMethod.GET)
+	public String getTripMedia(Model model, @PathVariable("slug") String slug) {
+		Trip trip = tripService.getBySlug(slug);
+
+		if (trip == null) {
+			logger.warn("Trip does not exist: " + slug);
+
+			return "redirect:/trips";
+		}
+
+		List<Point> media = tripService.getPointsWithMedia(trip);
+
+		if (media == null || media.isEmpty()) {
+			logger.warn("No media exists for trip [{}]", trip.getName());
+			
+			return "redirect:/trips/" + trip.getSlug();
+		}
+		
+		model.addAttribute("slug", slug);
+		model.addAttribute("trip", trip);
+		model.addAttribute("media", media);
+
+		return "media";
 	}
 	
 	/**

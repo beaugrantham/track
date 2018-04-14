@@ -29,5 +29,15 @@ public interface TripService {
 	 * @return a {@link List} of {@link Point}s.
 	 */
 	List<Point> getPoints(Trip trip);
+	
+	/**
+	 * Get a list of {@link Point}s for the specified {@link Trip} that contain
+	 * media.
+	 * 
+	 * @param trip
+	 *            The trip.
+	 * @return a {@link List} of {@link Point}s.
+	 */
+	List<Point> getPointsWithMedia(Trip trip);
 
 }

@@ -68,7 +68,7 @@
 				<c:forEach var="i" begin="1" end="4">
 					<div class="col-lg-3 col-md-6 mb-4">
 						<div class="card">
-							<img class="card-img-top" src="<c:url value="/trips/${trips[i].slug}.png" />" alt="">
+							<img class="card-img-top" src="<c:url value="/trips/${trips[i].slug}.png" />" alt="" />
 							<div class="card-body">
 								<h5 class="card-title"><c:out value="${trips[i].name}" /></h5>
 								<p class="card-text"><c:out value="${trips[i].description}" /></p>

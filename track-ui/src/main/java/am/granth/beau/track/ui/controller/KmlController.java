@@ -3,6 +3,8 @@ package am.granth.beau.track.ui.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +32,7 @@ import de.micromata.opengis.kml.v_2_2_0.KmlFactory;
 import de.micromata.opengis.kml.v_2_2_0.LineString;
 import de.micromata.opengis.kml.v_2_2_0.Placemark;
 import de.micromata.opengis.kml.v_2_2_0.Schema;
+import de.micromata.opengis.kml.v_2_2_0.SchemaData;
 import de.micromata.opengis.kml.v_2_2_0.Style;
 import de.micromata.opengis.kml.v_2_2_0.Units;
 import de.micromata.opengis.kml.v_2_2_0.Vec2;
@@ -46,6 +49,8 @@ public class KmlController {
 	private static final Logger logger = LoggerFactory.getLogger(KmlController.class);
 
 	public static final int MAX_ROWS = 500;
+	
+	private static final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
 	
 	@Value("${application.root}")
 	private String applicationRoot;
@@ -101,9 +106,9 @@ public class KmlController {
 				.withId("mediaData")
 				.withName("mediaData");
 		
-		mediaDataSchema.createAndAddSimpleField()
-				.withName("media")
-				.withType("string");
+		mediaDataSchema.createAndAddSimpleField().withName("media").withType("string");
+		mediaDataSchema.createAndAddSimpleField().withName("location").withType("string");
+		mediaDataSchema.createAndAddSimpleField().withName("datetime").withType("string");
 		
 		Vec2 iconHotspot = new Vec2()
 				.withX(0.5).withXunits(Units.FRACTION)
@@ -163,11 +168,16 @@ public class KmlController {
 							Double.parseDouble(p.getReportedLatitude().toString()));
 
 					if (p.getMedia() != null) {
-						waymarkPlacemark.createAndSetExtendedData()
+						SchemaData schemaData = waymarkPlacemark.createAndSetExtendedData()
 								.createAndAddSchemaData()
-								.withSchemaUrl("#mediaData")
-								.createAndAddSimpleData("media")
+								.withSchemaUrl("#mediaData");
+						
+						schemaData.createAndAddSimpleData("media")
 								.setValue(applicationRoot + "/trips/" + slug + "/media/" + p.getId() + ".jpg");
+						schemaData.createAndAddSimpleData("location")
+								.setValue(p.getReportedReverseGeocode());
+						schemaData.createAndAddSimpleData("datetime")
+								.setValue(ISO8601.format(p.getReportedTimestamp()));
 					}
 				}
 			}

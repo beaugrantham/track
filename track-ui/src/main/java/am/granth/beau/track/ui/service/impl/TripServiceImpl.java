@@ -35,4 +35,9 @@ public class TripServiceImpl implements TripService {
 		return pointDao.findByUserAndReportedTimestampBetweenAndRelationIdGreaterThanOrderByIdDesc(trip.getUser(), trip.getStartDate(), trip.getEndDate(), 0);
 	}
 
+	@Override
+	public List<Point> getPointsWithMedia(Trip trip) {
+		return pointDao.findByUserAndReportedTimestampBetweenAndMediaIsNotNullOrderByIdDesc(trip.getUser(), trip.getStartDate(), trip.getEndDate());
+	}
+
 }
