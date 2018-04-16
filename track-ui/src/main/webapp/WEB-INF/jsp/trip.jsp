@@ -76,7 +76,7 @@
 						
 						<!-- Media -->
 						<div class="card my-4">
-							<h5 class="card-header">Media</h5>
+							<h5 class="card-header">Media <c:if test="${fn:length(media) > 4}">(4 of <c:out value="${fn:length(media)}" />)</c:if></h5>
 							<div class="card-body">
  								<div class="row">
 									<c:forEach var="i" begin="0" end="${fn:length(media) > 4 ? 3 : fn:length(media) - 1}">
@@ -102,9 +102,11 @@
 									</c:if>
 								</div>
 							</div>
-							<div class="card-footer">
-								<a href="<c:url value="/trips/${trip.slug}/media" />" class="btn btn-primary float-right">View More</a>
-							</div>
+							<c:if test="${fn:length(media) > 4}">
+								<div class="card-footer">
+									<a href="<c:url value="/trips/${trip.slug}/media" />" class="btn btn-primary float-right">View More</a>
+								</div>
+							</c:if>
 						</div>
 					</c:if>
 				</div>
@@ -114,7 +116,7 @@
 
 					<!-- History -->
 					<div class="card my-4">
-						<h5 class="card-header">Latest Positions</h5>
+						<h5 class="card-header">Latest Positions (10)</h5>
 						<div class="card-body">
 
 							<c:choose>
@@ -124,7 +126,7 @@
 		
 								<c:otherwise>
 									<ul class="list-group">
-										<c:forEach var="i" begin="0" end="10">
+										<c:forEach var="i" begin="0" end="9">
 											<li class="list-group-item">
 												<c:out value="${points[i].reportedReverseGeocode}" /><br />
 												<span class="date-time"><fmt:formatDate value="${points[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /></span>
