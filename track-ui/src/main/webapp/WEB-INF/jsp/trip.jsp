@@ -276,8 +276,8 @@
 						<c:if test="${showWeather}">
 					        new ol.layer.Tile({
 								source: new ol.source.TileWMS({
-									url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi',
-									params: {'LAYERS': 'nexrad-n0q-900913'},
+									url: 'https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WMSServer',
+									params: {'LAYERS': '1'},
 					            }),
 					            opacity: 0.7
 							}),
