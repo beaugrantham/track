@@ -48,6 +48,7 @@ public class PointController {
 	 * {  
 	 *    "123":{  
 	 *       "time":"1517017568933",
+	 *       "timezone":"America/New_York",
 	 *       "user":"2432859998404394256",
 	 *       "satellites":"123",
 	 *       "annotation":"string",
@@ -75,9 +76,12 @@ public class PointController {
 			logger.info(entry.getKey() + "");
 
 			Date date = new Date(Long.parseLong(entry.getValue().get("time")));
-			Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 			logger.info("   " + "time       : " + format.format(date).toString());
 
+			String timezone = entry.getValue().get("timezone");
+			logger.info("   " + "timezone   : " + timezone);
+			
 			long user = Long.parseLong(entry.getValue().get("user"));
 			logger.info("   " + "user       : " + user);
 			
@@ -100,6 +104,7 @@ public class PointController {
 			Point point = new Point();
 			point.setUser(new User(user));
 			point.setReportedTimestamp(date);
+			point.setReportedTimezone(timezone);
 			point.setReportedLatitude(BigDecimal.valueOf(latitude));
 			point.setReportedLongitude(BigDecimal.valueOf(longitude));
 			point.setReportedAccuracyInMeters(accuracy.intValue());
