@@ -28,6 +28,7 @@ public class Point implements java.io.Serializable {
 	private Relation relation;
 	private User user;
 	private Date reportedTimestamp;
+	private String reportedTimezone;
 	private BigDecimal reportedLatitude;
 	private BigDecimal reportedLongitude;
 	private int reportedAccuracyInMeters;
@@ -76,6 +77,15 @@ public class Point implements java.io.Serializable {
 
 	public void setReportedTimestamp(Date reportedTimestamp) {
 		this.reportedTimestamp = reportedTimestamp;
+	}
+	
+	@Column(name = "reported_timezone", unique = false, nullable = true, insertable = true, updatable = true, length = 255)
+	public String getReportedTimezone() {
+		return reportedTimezone;
+	}
+	
+	public void setReportedTimezone(String reportedTimezone) {
+		this.reportedTimezone = reportedTimezone;
 	}
 
 	@Column(name = "reported_latitude", unique = false, nullable = false, insertable = true, updatable = true, precision = 12, scale = 6)
