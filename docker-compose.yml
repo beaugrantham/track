@@ -19,5 +19,7 @@ services:
       - /opt/track/mysql:/var/lib/mysql
   track-ui:
     image: beaugrantham/track-ui
+    volumes:
+      - /opt/track/www/media:/tmp/media
   track-api:
     image: beaugrantham/track-api

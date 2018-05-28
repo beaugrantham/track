@@ -1,6 +1,10 @@
 package am.granth.beau.track.api.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -10,6 +14,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,6 +44,9 @@ public class PointController {
 	private static final String reverseGeocode = "Geocoding...";
 	private static final int minutesReported = 0;
 
+	@Value("${media.dir}")
+	private String mediaDir;
+	
 	@Autowired
 	private PointDao pointDao;
 
@@ -115,6 +123,16 @@ public class PointController {
 			point.setRelation(relation);
 
 			pointDao.save(point);
+			
+			if (media != null) {
+				try {
+					byte[] decodedImg = Base64.getDecoder().decode(media.getBytes());
+					Path destinationFile = Paths.get(mediaDir, point.getId() + ".jpg");
+					Files.write(destinationFile, decodedImg);
+				} catch (IOException e) {
+					logger.error("Unable to write media to file", e);
+				}
+			}
 		}
 
 		return "success";
