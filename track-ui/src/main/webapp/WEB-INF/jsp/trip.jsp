@@ -80,7 +80,7 @@
 							<div class="card-body">
  								<div class="row">
 									<c:forEach var="i" begin="0" end="${fn:length(media) > 4 ? 3 : fn:length(media) - 1}">
-										<a href="<c:url value="${trip.slug}/media/${media[i].id}.jpg" />"
+										<a href="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />"
 											data-toggle="lightbox" 
 											data-gallery="media-gallery" 
 											data-title="${media[i].annotation}" 
@@ -97,7 +97,7 @@
 												data-gallery="media-gallery" 
 												data-title="${media[i].annotation}" 
 												data-footer='<span class="timezone-aware" data-reported-time="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />" data-reported-timezone="${media[i].reportedTimezone}"></span> <span>@ ${media[i].reportedReverseGeocode}</span>' 
-												data-remote="<c:url value="${trip.slug}/media/${media[i].id}.jpg" />"></div>
+												data-remote="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />"></div>
 										</c:forEach>
 									</c:if>
 								</div>
