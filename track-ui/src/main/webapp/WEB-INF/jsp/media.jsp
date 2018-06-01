@@ -82,7 +82,7 @@
 										data-title="${media[i].annotation}" 
 										data-footer='<span class="timezone-aware" data-reported-time="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />" data-reported-timezone="${media[i].reportedTimezone}"></span> <span>@ ${media[i].reportedReverseGeocode}</span>'
 										class="col-sm-3">
-										<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid rounded" style="margin-bottom: 15px;">
+										<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid img-thumbnail" style="margin-bottom: 15px;">
 									</a>
 								<c:if test="${status.index % 4 eq 3 or status.last}">
 									</div>
@@ -101,7 +101,7 @@
 						<h5 class="card-header">Map</h5>
 						<div class="card-body">
 							<a href="/trips/${trip.slug}">
-								<img class="img-fluid rounded" src="<c:url value="/trips/${trip.slug}.png" />" alt="" />
+								<img class="img-fluid img-thumbnail" src="<c:url value="/trips/${trip.slug}.png" />" alt="" />
 							</a>
 						</div>
 						<div class="card-footer">

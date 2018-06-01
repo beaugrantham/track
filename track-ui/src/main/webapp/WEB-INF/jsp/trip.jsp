@@ -86,7 +86,7 @@
 											data-title="${media[i].annotation}" 
 											data-footer='<span class="timezone-aware" data-reported-time="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />" data-reported-timezone="${media[i].reportedTimezone}"></span> <span>@ ${media[i].reportedReverseGeocode}</span>' 
 											class="col-sm-3">
-											<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid rounded" style="margin-bottom: 15px;">
+											<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid img-thumbnail" style="margin-bottom: 15px;">
 										</a>
 									</c:forEach>
 									

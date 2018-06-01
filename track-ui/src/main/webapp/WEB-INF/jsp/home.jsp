@@ -49,7 +49,7 @@
 			<div class="row">
 	
 				<div class="col-md-8">
-					<img class="img-fluid rounded" src="<c:url value="/trips/${trips[0].slug}.png" />" alt="" />
+					<img class="img-fluid img-thumbnail" src="<c:url value="/trips/${trips[0].slug}.png" />" alt="" />
 				</div>
 	
 				<div class="col-md-4">
