@@ -109,6 +109,7 @@ public class KmlController {
 		mediaDataSchema.createAndAddSimpleField().withName("media").withType("string");
 		mediaDataSchema.createAndAddSimpleField().withName("location").withType("string");
 		mediaDataSchema.createAndAddSimpleField().withName("datetime").withType("string");
+		mediaDataSchema.createAndAddSimpleField().withName("timezone").withType("string");
 		
 		Vec2 iconHotspot = new Vec2()
 				.withX(0.5).withXunits(Units.FRACTION)
@@ -178,6 +179,8 @@ public class KmlController {
 								.setValue(p.getReportedReverseGeocode());
 						schemaData.createAndAddSimpleData("datetime")
 								.setValue(ISO8601.format(p.getReportedTimestamp()));
+						schemaData.createAndAddSimpleData("timezone")
+								.setValue(p.getReportedTimezone());
 					}
 				}
 			}

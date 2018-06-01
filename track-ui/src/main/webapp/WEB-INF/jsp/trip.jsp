@@ -84,7 +84,7 @@
 											data-toggle="lightbox" 
 											data-gallery="media-gallery" 
 											data-title="${media[i].annotation}" 
-											data-footer="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /> @ ${media[i].reportedReverseGeocode}" 
+											data-footer='<span class="timezone-aware" data-reported-time="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />" data-reported-timezone="${media[i].reportedTimezone}"></span> <span>@ ${media[i].reportedReverseGeocode}</span>' 
 											class="col-sm-3">
 											<img src="<c:url value="/trips/${trip.slug}/media/${media[i].id}.jpg" />" class="img-fluid rounded" style="margin-bottom: 15px;">
 										</a>
@@ -96,7 +96,7 @@
 												data-toggle="lightbox" 
 												data-gallery="media-gallery" 
 												data-title="${media[i].annotation}" 
-												data-footer="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /> @ ${media[i].reportedReverseGeocode}" 
+												data-footer='<span class="timezone-aware" data-reported-time="<fmt:formatDate value="${media[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />" data-reported-timezone="${media[i].reportedTimezone}"></span> <span>@ ${media[i].reportedReverseGeocode}</span>' 
 												data-remote="<c:url value="${trip.slug}/media/${media[i].id}.jpg" />"></div>
 										</c:forEach>
 									</c:if>
@@ -129,7 +129,10 @@
 										<c:forEach var="i" begin="0" end="9">
 											<li class="list-group-item">
 												<c:out value="${points[i].reportedReverseGeocode}" /><br />
-												<span class="date-time"><fmt:formatDate value="${points[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" /></span>
+												<span class="timezone-aware"
+													data-reported-time="<fmt:formatDate value="${points[i].reportedTimestamp}" type="both" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" />"
+													data-reported-timezone="${points[i].reportedTimezone}">
+												</span>
 											</li>
 										</c:forEach>
 									</ul>
@@ -164,31 +167,19 @@
 		<!-- ekko-lightbox JS -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
 
+		<!-- moment.js -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.16/moment-timezone-with-data.min.js"></script>
+
 		<!-- OpenLayers JS -->
 		<script src="<c:url value="/resources/js/ol.js" />"></script>
 		<script src="<c:url value="/resources/js/ol-popup.js" />"></script>
+
+		<!-- Custom JS -->
+		<script src="<c:url value="/resources/js/track.js" />"></script>
 		
 	    <script>
 			$(document).ready(function() {
-				// Convert ISO8601 UTC date/time to local date/time
-				var localizeDate = function(utc) {
-					var date = new Date(utc);
-					return date.toLocaleString("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
-				};
-				
-				// Convert date/time to local (history)
-				$(".date-time").each(function() {
-					$(this).text(localizeDate($(this).text()));
-				});
-				
-				// Convert date/time to local (media)
-				$('*[data-footer]').filter(function() {
-					return $(this).attr('data-footer').match(/^\S+T\S+Z\s@\s.*$/);
-				}).each(function(e) {
-					var text = $(this).attr('data-footer').split('@', 2);
-					$(this).attr('data-footer', localizeDate(text[0].trim()) + ' @ ' + text[1].trim());
-				});
-				
 				window.app = {};
 				var app = window.app;
 				
@@ -306,9 +297,9 @@
 						if (feature.get('media') !== undefined) {
 						    $("#media")
 						    	.attr("data-title", feature.get('description'))
-					    		.attr("data-footer", localizeDate(feature.get('datetime')) + ' @ ' + feature.get('location'))
+					    		.attr("data-footer", '<span class="timezone-aware" data-reported-time="' + feature.get('datetime') + '" data-reported-timezone="' + feature.get('timezone') + '"></span> <span>@ ' + feature.get('location') + '</span>')
 					    		.attr("data-remote", feature.get('media'))
-					    		.ekkoLightbox();
+					    		.ekkoLightbox({ "onContentLoaded" : function() { adjustTimezones(session['timezone']); } });
 						} else {
 							popup.show(evt.coordinate, '<div><p>' + feature.get('description') + '</p></div>');
 						}
@@ -344,7 +335,7 @@
 			// Enable ekko-lightbox
 			$(document).on('click', '[data-toggle="lightbox"]', function(event) {
 				event.preventDefault();
-				$(this).ekkoLightbox();
+				$(this).ekkoLightbox({ "onContentLoaded" : function() { adjustTimezones(session['timezone']); } });
 			});
 	    </script>
 
