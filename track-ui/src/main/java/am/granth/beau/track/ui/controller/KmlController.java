@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import am.granth.beau.track.entity.Marker;
@@ -63,11 +64,13 @@ public class KmlController {
 	 * 
 	 * @param slug
 	 *            The slug to use for looking up a trip.
+	 * @param media
+	 *            Whether or not to include media markers.
 	 * @return the generated KML.
 	 */
 	@RequestMapping(value = "/{slug}.kml", method = RequestMethod.GET, produces = "application/xml")
-	public @ResponseBody String generateKmlViaApi(@PathVariable("slug") String slug) {
-		return generateKmlViaApiWithCache(slug, null);
+	public @ResponseBody String generateKmlViaApi(@PathVariable("slug") String slug, @RequestParam(name="media", defaultValue = "true") boolean media) {
+		return generateKmlViaApiWithCache(slug, null, media);
 	}
 
 	/**
@@ -78,10 +81,12 @@ public class KmlController {
 	 *            The slug to use for looking up a trip.
 	 * @param random
 	 *            A string for client cacehing.
+	 * @param media
+	 *            Whether or not to include media markers.
 	 * @return the generated KML.
 	 */
 	@RequestMapping(value = "/{slug}/{cache}.kml", method = RequestMethod.GET, produces = "application/xml")
-	public @ResponseBody String generateKmlViaApiWithCache(@PathVariable("slug") String slug, @PathVariable("cache") String random) {
+	public @ResponseBody String generateKmlViaApiWithCache(@PathVariable("slug") String slug, @PathVariable("cache") String random, @RequestParam(name="media", defaultValue = "true") boolean media) {
 		List<Point> points = null;
 
 		Trip trip = tripService.getBySlug(slug);
@@ -156,31 +161,35 @@ public class KmlController {
 						Double.parseDouble(p.getReportedLatitude().toString())));
 				
 				/*
-				 * Add annotation markers
+				 * Add annotation markers.
+				 *
+				 * Skip media markers if media=false.
 				 */
 				
 				if (!StringUtils.isEmpty(p.getAnnotation())) {
-					Placemark waymarkPlacemark = document.createAndAddPlacemark()
-							.withDescription(p.getAnnotation())
-							.withStyleUrl(p.getMedia() == null ? "#styleWaymark" : "#styleMediaWaymark");
-							
-					waymarkPlacemark.createAndSetPoint().addToCoordinates(
-							Double.parseDouble(p.getReportedLongitude().toString()),
-							Double.parseDouble(p.getReportedLatitude().toString()));
+					if (media || p.getMedia() == null) {
+						Placemark waymarkPlacemark = document.createAndAddPlacemark()
+								.withDescription(p.getAnnotation())
+								.withStyleUrl(p.getMedia() == null ? "#styleWaymark" : "#styleMediaWaymark");
 
-					if (p.getMedia() != null) {
-						SchemaData schemaData = waymarkPlacemark.createAndSetExtendedData()
-								.createAndAddSchemaData()
-								.withSchemaUrl("#mediaData");
-						
-						schemaData.createAndAddSimpleData("media")
-								.setValue(applicationRoot + "/trips/" + slug + "/media/" + p.getId() + ".jpg");
-						schemaData.createAndAddSimpleData("location")
-								.setValue(p.getReportedReverseGeocode());
-						schemaData.createAndAddSimpleData("datetime")
-								.setValue(ISO8601.format(p.getReportedTimestamp()));
-						schemaData.createAndAddSimpleData("timezone")
-								.setValue(p.getReportedTimezone());
+						waymarkPlacemark.createAndSetPoint().addToCoordinates(
+								Double.parseDouble(p.getReportedLongitude().toString()),
+								Double.parseDouble(p.getReportedLatitude().toString()));
+
+						if (p.getMedia() != null) {
+							SchemaData schemaData = waymarkPlacemark.createAndSetExtendedData()
+									.createAndAddSchemaData()
+									.withSchemaUrl("#mediaData");
+							
+							schemaData.createAndAddSimpleData("media")
+									.setValue(applicationRoot + "/trips/" + slug + "/media/" + p.getId() + ".jpg");
+							schemaData.createAndAddSimpleData("location")
+									.setValue(p.getReportedReverseGeocode());
+							schemaData.createAndAddSimpleData("datetime")
+									.setValue(ISO8601.format(p.getReportedTimestamp()));
+							schemaData.createAndAddSimpleData("timezone")
+									.setValue(p.getReportedTimezone());
+						}
 					}
 				}
 			}

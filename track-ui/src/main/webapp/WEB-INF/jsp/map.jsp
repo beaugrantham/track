@@ -49,7 +49,7 @@
 
 				// KML source
 				var source = new ol.source.Vector({
-					url: '<c:url value="/kml" />/<c:out value="${slug}" />/<c:out value="${timestamp}" />.kml',
+					url: '<c:url value="/kml" />/<c:out value="${slug}" />/<c:out value="${timestamp}" />.kml?media=false',
 					format: new ol.format.KML()
 				});
 
